@@ -195,7 +195,6 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
                         <select name="keterangan" class="w-full p-2 text-[11px] border rounded font-bold">
                             <option value="Cicilan">Cicilan</option>
                             <option value="Pelunasan">Pelunasan</option>
-                            <option value="DP Tambahan">DP Tambahan</option>
                         </select>
                     </div>
                     <div>
@@ -204,7 +203,6 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
                             <option value="Tunai">Tunai</option>
                             <option value="Transfer BSI">Transfer BSI</option>
                             <option value="Transfer BCA">Transfer BCA</option>
-                            <option value="QRIS">QRIS</option>
                         </select>
                     </div>
                 </div>
@@ -279,7 +277,7 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-4">
+                    <div class="flex sm:grid-cols-3 gap-2 pt-4">
                         <!-- <button type="button" onclick="setLunas()" class="w-full bg-green-600 text-white p-3 rounded-lg font-black uppercase text-[10px] hover:bg-green-700 transition shadow-md">Bayar Lunas</button> -->
                         <button type="submit" class="w-full bg-blue-800 text-white p-3 rounded-lg font-black uppercase text-[10px] hover:bg-blue-900 transition shadow-md">Simpan Data</button>
                         <button type="button" onclick="window.print()" class="w-full bg-gray-800 text-white p-3 rounded-lg font-black uppercase text-[10px] hover:bg-black transition shadow-md"><i class="fas fa-print mr-1"></i> Cetak</button>
@@ -425,27 +423,24 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
                             <?php 
                             $query_tr = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masuk DESC, no_nota DESC");
                             
-                            $allowed_items = [
-                                'JERSEY TYPE A (FULL PRINT)', 'JERSEY TYPE B (STANDAR)',
-                                'JERSEY TYPE C (JERSEY ONLY)', 'JERSEY TYPE D (BASIC)',
-                                'BASEBALL JERSEY', 'BASKETBALL JERSEY',
-                                'JERSEY PRINTING KIDS', 'JERSEY SETELAN JADI (POLOS)','JERSEY SETELAN JADI (SABLON)',
-                            ];
-
                             if(mysqli_num_rows($query_tr) > 0):
-                                while($t = mysqli_fetch_assoc($query_tr)): 
-                                    $items_arr = json_decode($t['items'], true);
-                                    $filtered_qty = 0; 
+                            while($t = mysqli_fetch_assoc($query_tr)): 
+                                $items_arr = json_decode($t['items'], true);
+                                $filtered_qty = 0; 
 
-                                    if(is_array($items_arr)) { 
-                                        foreach($items_arr as $io) { 
-                                            $nama_item = strtoupper(trim($io['nama'] ?? ''));
-                                            $qty_item = (int)($io['qty'] ?? 0);
-                                            if (in_array($nama_item, $allowed_items)) {
-                                                $filtered_qty += $qty_item; 
-                                            }
-                                        } 
-                                    }
+                                if(is_array($items_arr)) { 
+                                    foreach($items_arr as $io) { 
+                                        // 1. Ambil nama item dan jadikan Huruf Kapital semua
+                                        $nama_item = strtoupper(trim($io['nama'] ?? ''));
+                                        $qty_item = (int)($io['qty'] ?? 0);
+
+                                        // 2. Cek apakah di dalam nama item terdapat kata "JERSEY"
+                                        // Menggunakan strpos agar kompatibel dengan PHP versi lama maupun baru
+                                        if (strpos($nama_item, 'JERSEY') !== false) {
+                                            $filtered_qty += $qty_item; 
+                                        }
+                                    } 
+                                }
                             ?>
                             <tr class="border-b hover:bg-gray-50 transition">
                                 <td class="p-4 text-center border-l">
