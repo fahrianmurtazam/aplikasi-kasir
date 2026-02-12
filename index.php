@@ -161,6 +161,61 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
         </div>
     </div>
 
+    <div id="modalPayment" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200 border-t-4 border-green-600">
+            <div class="p-4 bg-white flex justify-between items-center border-b">
+                <h3 class="font-black uppercase text-sm text-green-700">
+                    <i class="fas fa-money-bill-wave mr-2"></i> Input Pembayaran
+                </h3>
+                <button onclick="closePaymentModal()" class="text-xl leading-none text-gray-400 hover:text-red-500">&times;</button>
+            </div>
+            <form action="proses_bayar.php" method="POST" class="p-6 space-y-4">
+                <input type="hidden" name="no_nota" id="pay_nota">
+                
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Pelanggan</p>
+                    <p class="font-bold text-blue-900 text-sm" id="pay_nama">-</p>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold mt-2">Sisa Tagihan Saat Ini</p>
+                    <p class="font-black text-red-600 text-lg" id="pay_sisa">Rp 0</p>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Tanggal Bayar</label>
+                    <input type="date" name="tgl_bayar" value="<?= date('Y-m-d') ?>" required class="w-full p-2 text-sm border rounded outline-none focus:ring-1 focus:ring-green-500">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Jumlah Bayar (Rp)</label>
+                    <input type="number" name="jumlah" id="pay_jumlah" required class="w-full p-2 text-sm border rounded outline-none font-bold text-gray-800 focus:ring-1 focus:ring-green-500" placeholder="0">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Tipe</label>
+                        <select name="keterangan" class="w-full p-2 text-[11px] border rounded font-bold">
+                            <option value="Cicilan">Cicilan</option>
+                            <option value="Pelunasan">Pelunasan</option>
+                            <option value="DP Tambahan">DP Tambahan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Metode</label>
+                        <select name="metode" class="w-full p-2 text-[11px] border rounded font-bold">
+                            <option value="Tunai">Tunai</option>
+                            <option value="Transfer BSI">Transfer BSI</option>
+                            <option value="Transfer BCA">Transfer BCA</option>
+                            <option value="QRIS">QRIS</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" name="bayar_cicilan" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold text-xs uppercase shadow-lg transition transform active:scale-95">
+                    Simpan Pembayaran
+                </button>
+            </form>
+        </div>
+    </div>
+
     <main class="max-w-7xl mx-auto p-4 md:p-8">
         <div id="section-input" class="flex flex-col lg:flex-row gap-8">
             <div class="w-full lg:w-1/2 bg-white rounded-xl shadow-md p-5 md:p-6 no-print">
@@ -225,13 +280,12 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-4">
-                        <button type="button" onclick="setLunas()" class="w-full bg-green-600 text-white p-3 rounded-lg font-black uppercase text-[10px] hover:bg-green-700 transition shadow-md">Bayar Lunas</button>
+                        <!-- <button type="button" onclick="setLunas()" class="w-full bg-green-600 text-white p-3 rounded-lg font-black uppercase text-[10px] hover:bg-green-700 transition shadow-md">Bayar Lunas</button> -->
                         <button type="submit" class="w-full bg-blue-800 text-white p-3 rounded-lg font-black uppercase text-[10px] hover:bg-blue-900 transition shadow-md">Simpan Data</button>
                         <button type="button" onclick="window.print()" class="w-full bg-gray-800 text-white p-3 rounded-lg font-black uppercase text-[10px] hover:bg-black transition shadow-md"><i class="fas fa-print mr-1"></i> Cetak</button>
                     </div>
                 </form>
             </div>
-            <!-- lembar Invoice -->
             <div class="lg:w-1/2 flex justify-center p-6">
                 <div id="invoice-sheet" class="print-area shadow-lg relative flex flex-col justify-between border p-6">
                     <div>
@@ -440,7 +494,12 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
                                         <?= $t['status'] ?>
                                     </span>
                                 </td>
-                                <td class="p-4 text-center space-x-2">
+                                <td class="p-4 text-center space-x-2 flex justify-center items-center">
+                                    <button onclick="openPaymentModal('<?= $t['no_nota'] ?>', <?= $t['sisa'] ?>, '<?= addslashes($t['nama_pelanggan']) ?>')" 
+                                            class="text-green-600 hover:text-green-800 transition" title="Bayar Cicilan">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </button>
+
                                     <button onclick='editData(<?= json_encode($t) ?>)' class="text-blue-600 hover:text-blue-900 transition"><i class="fas fa-edit"></i></button>
                                     <button onclick="confirmDeleteTransaksi('<?= $t['no_nota']; ?>')" class="text-red-500 hover:text-red-800 transition">
                                         <i class="fas fa-trash"></i>
@@ -492,6 +551,21 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
         }
 
         function closeModal() { document.getElementById('modalBarang').classList.add('hidden'); }
+        
+        // --- LOGIKA MODAL PEMBAYARAN (BARU) ---
+        function openPaymentModal(nota, sisa, nama) {
+            document.getElementById('modalPayment').classList.remove('hidden');
+            document.getElementById('pay_nota').value = nota;
+            document.getElementById('pay_nama').innerText = nama;
+            document.getElementById('pay_sisa').innerText = "Rp " + parseInt(sisa).toLocaleString();
+            
+            // Auto isi jumlah bayar dengan sisa tagihan (biar cepat)
+            document.getElementById('pay_jumlah').value = sisa;
+        }
+
+        function closePaymentModal() {
+            document.getElementById('modalPayment').classList.add('hidden');
+        }
 
         function selectItem(nama, harga) {
             if(currentTargetRow) {
@@ -873,6 +947,11 @@ if(checkAll) {
             Toast.fire({
                 icon: 'success',
                 title: 'Data berhasil dihapus!'
+            });
+        } else if (msg === 'payment_success') {
+            Toast.fire({
+                icon: 'success',
+                title: 'Pembayaran berhasil dicatat!'
             });
         } else if (msg === 'error') {
             Toast.fire({
