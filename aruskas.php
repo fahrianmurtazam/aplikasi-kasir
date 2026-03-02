@@ -86,7 +86,7 @@ usort($data_gabungan, function($a, $b) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arus Kas Pro - Guzel Apparel</title>
+    <title>Arus Kas - Guzel Apparel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -163,7 +163,7 @@ usort($data_gabungan, function($a, $b) {
                             <input type="date" name="tgl_awal" value="<?= $tgl_awal ?>" class="text-[10px] p-1 rounded">
                             <input type="date" name="tgl_akhir" value="<?= $tgl_akhir ?>" class="text-[10px] p-1 rounded">
                             <button class="bg-yellow-500 px-3 rounded text-[10px]"><i class="fas fa-search"></i></button>
-                             <a href="export_aruskas.php?tgl_awal=<?= $tgl_awal ?>&tgl_akhir=<?= $tgl_akhir ?>" 
+                            <a href="export_aruskas.php?tgl_awal=<?= $tgl_awal ?>&tgl_akhir=<?= $tgl_akhir ?>" 
                             class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-[10px] font-bold transition flex items-center gap-1 shadow-md">
                                 <i class="fas fa-file-excel"></i> EXCEL
                             </a>

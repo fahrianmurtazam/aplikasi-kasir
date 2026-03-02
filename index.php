@@ -24,7 +24,7 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guzel Apparel_Management System</title>
+    <title>Guzel Apparel Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -337,8 +337,8 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
                                     <td class="text-right">Rp <span id="out-panjar">0</span></td>
                                 </tr>
                                 <tr class="bg-gray-50 font-black italic">
-                                    <td class="py-0.5 text-blue-900">SISA TAGIHAN</td>
-                                    <td class="text-right text-blue-900">Rp <span id="out-sisa">0</span></td>
+                                    <td class="py-0.5 text-red-600">SISA TAGIHAN</td>
+                                    <td class="text-right text-red-600">Rp <span id="out-sisa">0</span></td>
                                 </tr>
                             </table>
                             <div id="label-lunas" class="hidden absolute right-2 top-2 border-4 border-slate-800 text-grey-600 text-xl font-black px-2 py-1 rotate-[-20deg] opacity-50 uppercase tracking-widest pointer-events-none">LUNAS</div>
