@@ -229,8 +229,9 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 uppercase">Estimasi</label>
                             <select name="estimasi" id="in-status" class="w-full p-3 bg-gray-50 border rounded-lg" onchange="updateDeadline(); updateTotals()">
-                                <option value="Normal">Normal (24 Hari)</option>
+                                <option value="Normal">Normal (22 Hari)</option>
                                 <option value="Express">Express (14 Hari)</option>
+                                <option value="Super Express">Super Express (7 Hari)</option>
                             </select>
                         </div>
                         <div>
@@ -400,110 +401,117 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
                     <button onclick="hapusMasal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-[10px] font-bold uppercase">
                         <i class="fas fa-trash-alt mr-2"></i> Hapus Terpilih
                     </button>
-                    <table class="w-full text-[10px] text-left border-collapse min-w-[800px]">
-                        <thead class="bg-yellow-400 font-black uppercase text-gray-800">
-                            <tr>
-                                <th class="p-4 border border-yellow-500 text-center">
-                                    <input type="checkbox" id="checkAll" class="w-4 h-4 cursor-pointer">
-                                </th>
-                                <th class="p-4 border border-yellow-500 font-black">Nota</th>
-                                <th class="p-2 border border-yellow-500 font-black">Tgl Produksi</th>
-                                <th class="p-4 border border-yellow-500 font-black text-red-700">Deadline</th>
-                                <th class="p-4 border border-yellow-500 font-black">Pelanggan</th>
-                                <th class="p-4 border border-yellow-500 font-black text-center">Qty</th>
-                                <th class="p-4 border border-yellow-500 font-black text-center">Sisa Tagihan</th>
-                                
-                                <th class="p-4 border border-yellow-500 font-black text-center w-32">PRODUKSI</th>
-                                
-                                <th class="p-4 border border-yellow-500 font-black text-center">Status</th>
-                                <th class="p-4 border border-yellow-500 font-black text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transaksi-body">
-                            <?php 
-                            $query_tr = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masuk DESC, no_nota DESC");
-                            
-                            if(mysqli_num_rows($query_tr) > 0):
-                            while($t = mysqli_fetch_assoc($query_tr)): 
-                                $items_arr = json_decode($t['items'], true);
-                                $filtered_qty = 0; 
+                    <table class="w-full text-[10px] text-left border-collapse min-w-[1200px]">
+                    <thead class="bg-yellow-400 font-black uppercase text-gray-800">
+                        <tr>
+                            <th class="p-4 border border-yellow-500 text-center">
+                                <input type="checkbox" id="checkAll" class="w-4 h-4 cursor-pointer">
+                            </th>
+                            <th class="p-4 border border-yellow-500 font-black text-center">Nota</th>
+                            <th class="p-4 border border-yellow-500 font-black text-center">Estimasi</th>
+                            <th class="p-4 border border-yellow-500 font-black text-center">Tgl Produksi</th>
+                            <th class="p-4 border border-yellow-500 font-black text-center text-red-700">Deadline</th>
+                            <th class="p-4 border border-yellow-500 font-black text-center">Pelanggan</th>
+                            <th class="p-4 border border-yellow-500 font-black text-center">Qty</th>
+                            <th class="p-4 border border-yellow-500 font-black text-center">Sisa Tagihan</th>
+                            <th class="p-4 border border-yellow-500 font-black text-center w-32">PRODUKSI</th>
+                            <th class="p-4 border border-yellow-500 font-black text-center">Status</th>
+                            <th class="p-4 border border-yellow-500 font-black text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transaksi-body">
+                        <?php 
+                        $query_tr = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masuk DESC, no_nota DESC");
+                        
+                        if(mysqli_num_rows($query_tr) > 0):
+                        while($t = mysqli_fetch_assoc($query_tr)): 
+                            $items_arr = json_decode($t['items'], true);
+                            $filtered_qty = 0; 
 
-                                if(is_array($items_arr)) { 
-                                    foreach($items_arr as $io) { 
-                                        // 1. Ambil nama item dan jadikan Huruf Kapital semua
-                                        $nama_item = strtoupper(trim($io['nama'] ?? ''));
-                                        $qty_item = (int)($io['qty'] ?? 0);
-
-                                        // 2. Cek apakah di dalam nama item terdapat kata "JERSEY"
-                                        // Menggunakan strpos agar kompatibel dengan PHP versi lama maupun baru
-                                        if (strpos($nama_item, 'JERSEY') !== false) {
-                                            $filtered_qty += $qty_item; 
-                                        }
-                                    } 
-                                }
-                            ?>
-                            <tr class="border-b hover:bg-gray-50 transition">
-                                <td class="p-4 text-center border-l">
-                                    <input type="checkbox" name="nota_id[]" value="<?= $t['no_nota']; ?>" class="checkItem w-4 h-4 cursor-pointer">
-                                </td>
-                                
-                                <td class="p-4 font-black text-blue-900">#<?= str_pad($t['no_nota'], 4, "0", STR_PAD_LEFT) ?></td>
-                                <td class="p-4 text-[11px] font-semibold text-gray-700"><?= date('d/m/Y', strtotime($t['tgl_masuk'])) ?></td>
-                                <td class="p-4 text-[11px] font-bold text-red-600"><?= date('d/m/Y', strtotime($t['deadline'])) ?></td>
-                                <td class="p-4 text-sm font-bold uppercase"><?= $t['nama_pelanggan'] ?></td>
-                                <td class="p-4 text-center">
-                                    <span class="text-blue-700 text-[12px] font-black">
-                                        <?= $filtered_qty ?> <small class="text-[10px]">PCS</small>
-                                    </span>
-                                </td>
-                                <td class="p-4 text-right font-black text-blue-900">Rp <?= number_format($t['sisa']) ?></td>
-                                
-                                <td class="p-4 text-center">
-                                    <?php
-                                    // Logika Warna Background (Gunakan variabel $t bukan $row)
-                                    $prod_status = $t['produksi'] ?? '-'; // Gunakan coalescing operator untuk keamanan
-                                    
-                                    $bg_class = "bg-gray-100 text-gray-700 border-gray-200"; // Default Abu
-                                    if ($prod_status == 'FACTORY') {
-                                        $bg_class = "bg-blue-100 text-blue-800 border-blue-200";
-                                    } elseif ($prod_status == 'FASTPRINT') {
-                                        $bg_class = "bg-orange-100 text-orange-800 border-orange-200";
+                            if(is_array($items_arr)) { 
+                                foreach($items_arr as $io) { 
+                                    $nama_item = strtoupper(trim($io['nama'] ?? ''));
+                                    $qty_item = (int)($io['qty'] ?? 0);
+                                    if (strpos($nama_item, 'JERSEY') !== false) {
+                                        $filtered_qty += $qty_item; 
                                     }
-                                    ?>
-                                    
-                                    <div class="relative">
-                                        <select onchange="updateProduksi(this, '<?= $t['no_nota'] ?>')" 
-                                                class="appearance-none w-full text-[10px] font-black uppercase py-2 px-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors cursor-pointer <?= $bg_class ?>">
-                                            <option value="-" <?= $prod_status == '-' ? 'selected' : '' ?>>-</option>
-                                            <option value="FACTORY" <?= $prod_status == 'FACTORY' ? 'selected' : '' ?>>FACTORY</option>
-                                            <option value="FASTPRINT" <?= $prod_status == 'FASTPRINT' ? 'selected' : '' ?>>FASTPRINT</option>
-                                        </select>
-                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-gray-400">
-                                            <i class="fas fa-chevron-down text-[8px]"></i>
-                                        </div>
+                                } 
+                            }
+
+                            // Logika Warna Badge Estimasi
+                            $est_val = $t['estimasi'] ?? 'Normal';
+                            $est_class = "bg-gray-100 text-gray-700"; // Default Normal
+                            if ($est_val == 'Super Express') {
+                                $est_class = "bg-red-100 text-red-600 border border-red-200";
+                            } elseif ($est_val == 'Express') {
+                                $est_class = "bg-amber-100 text-amber-700 border border-amber-200";
+                            }
+                        ?>
+                        <tr class="border-b hover:bg-gray-50 transition">
+                            <td class="p-4 text-center border-l">
+                                <input type="checkbox" name="nota_id[]" value="<?= $t['no_nota']; ?>" class="checkItem w-4 h-4 cursor-pointer">
+                            </td>
+                            
+                            <td class="p-4 font-black text-blue-900">#<?= str_pad($t['no_nota'], 4, "0", STR_PAD_LEFT) ?></td>
+                            
+                            <td class="p-4">
+                                <span class="px-2 py-1 rounded-md text-[10px] font-black uppercase <?= $est_class ?>">
+                                    <?= $est_val ?>
+                                </span>
+                            </td>
+
+                            <td class="p-4 text-[11px] font-semibold text-gray-700"><?= date('d/m/Y', strtotime($t['tgl_masuk'])) ?></td>
+                            <td class="p-4 text-[11px] font-bold text-red-600"><?= date('d/m/Y', strtotime($t['deadline'])) ?></td>
+                            <td class="p-2 text-[13px] font-bold uppercase"><?= $t['nama_pelanggan'] ?></td>
+                            <td class="p-4 w-20 text-center">
+                                <span class="text-blue-700 text-[12px] font-black">
+                                    <?= $filtered_qty ?> <small class="text-[10px]">PCS</small>
+                                </span>
+                            </td>
+                            <td class="p-2 w-32 text-right font-black text-blue-900">Rp <?= number_format($t['sisa']) ?></td>
+                            
+                            <td class="p-4 text-center">
+                                <?php
+                                $prod_status = $t['produksi'] ?? '-';
+                                $bg_class = "bg-gray-100 text-gray-700 border-gray-200";
+                                if ($prod_status == 'FACTORY') {
+                                    $bg_class = "bg-blue-100 text-blue-800 border-blue-200";
+                                } elseif ($prod_status == 'FASTPRINT') {
+                                    $bg_class = "bg-orange-100 text-orange-800 border-orange-200";
+                                }
+                                ?>
+                                <div class="relative">
+                                    <select onchange="updateProduksi(this, '<?= $t['no_nota'] ?>')" 
+                                            class="appearance-none w-full text-[10px] font-black uppercase py-2 px-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors cursor-pointer <?= $bg_class ?>">
+                                        <option value="-" <?= $prod_status == '-' ? 'selected' : '' ?>>-</option>
+                                        <option value="FACTORY" <?= $prod_status == 'FACTORY' ? 'selected' : '' ?>>FACTORY</option>
+                                        <option value="FASTPRINT" <?= $prod_status == 'FASTPRINT' ? 'selected' : '' ?>>FASTPRINT</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-gray-400">
+                                        <i class="fas fa-chevron-down text-[8px]"></i>
                                     </div>
-                                </td>
+                                </div>
+                            </td>
 
-                                <td class="p-4 text-center">
-                                    <span class="px-2 py-1 rounded text-[10px] font-black uppercase <?= $t['status'] == 'Lunas' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600' ?>">
-                                        <?= $t['status'] ?>
-                                    </span>
-                                </td>
-                                <td class="p-4 text-center space-x-2 flex justify-center items-center">
-                                    <button onclick="openPaymentModal('<?= $t['no_nota'] ?>', <?= $t['sisa'] ?>, '<?= addslashes($t['nama_pelanggan']) ?>')" 
-                                            class="text-green-600 hover:text-green-800 transition" title="Bayar Cicilan">
-                                        <i class="fas fa-money-bill-wave"></i>
-                                    </button>
-
-                                    <button onclick='editData(<?= json_encode($t) ?>)' class="text-blue-600 hover:text-blue-900 transition"><i class="fas fa-edit"></i></button>
-                                    <button onclick="confirmDeleteTransaksi('<?= $t['no_nota']; ?>')" class="text-red-500 hover:text-red-800 transition">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <?php endwhile; endif; ?>
-                        </tbody>
-                    </table>
+                            <td class="w-32 text-center">
+                                <span class=" px-2 py-1 rounded text-[10px] font-black uppercase <?= $t['status'] == 'Lunas' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600' ?>">
+                                    <?= $t['status'] ?>
+                                </span>
+                            </td>
+                            <td class="p-4 text-center space-x-2 flex justify-center items-center">
+                                <button onclick="openPaymentModal('<?= $t['no_nota'] ?>', <?= $t['sisa'] ?>, '<?= addslashes($t['nama_pelanggan']) ?>')" 
+                                        class="text-green-600 hover:text-green-800 transition" title="Bayar Cicilan">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </button>
+                                <button onclick='editData(<?= json_encode($t) ?>)' class="text-blue-600 hover:text-blue-900 transition"><i class="fas fa-edit"></i></button>
+                                <button onclick="confirmDeleteTransaksi('<?= $t['no_nota']; ?>')" class="text-red-500 hover:text-red-800 transition">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <?php endwhile; endif; ?>
+                    </tbody>
+                </table>
                 </div>
             </div>
         </div>
@@ -588,14 +596,33 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
         }
 
         function updateDeadline() {
-            const tglVal = document.getElementById('in-tgl').value;
-            if(!tglVal) return;
-            const tgl = new Date(tglVal);
-            const est = document.getElementById('in-status').value;
-            tgl.setDate(tgl.getDate() + (est === 'Normal' ? 24 : 14));
-            document.getElementById('in-deadline').value = tgl.toISOString().split('T')[0];
+        const tglVal = document.getElementById('in-tgl').value;
+        if (!tglVal) return;
+        
+        const tgl = new Date(tglVal);
+        const est = document.getElementById('in-status').value;
+        
+        let tambahanHari = 0;
+
+        // Logika penentuan jumlah hari berdasarkan pilihan
+        if (est === 'Normal') {
+            tambahanHari = 22; // Sesuai teks di option Anda (22 hari)
+        } else if (est === 'Express') {
+            tambahanHari = 14;
+        } else if (est === 'Super Express') {
+            tambahanHari = 7;
+        }
+
+        tgl.setDate(tgl.getDate() + tambahanHari);
+        
+        // Update input deadline
+        document.getElementById('in-deadline').value = tgl.toISOString().split('T')[0];
+        
+        // Pastikan fungsi pendukung lainnya tetap jalan
+        if (typeof updateTotals === "function") {
             updateTotals();
         }
+    }
 
     function setLunas() {
     let subtotal = 0;
@@ -733,8 +760,10 @@ function updateTotals() {
         const estimasiValue = document.getElementById('in-status').value; // 'in-status' adalah ID input estimasi Anda
         const outEstimasi = document.getElementById('out-estimasi');
         outEstimasi.innerText = estimasiValue;
-        // OPSIONAL: Memberi warna merah jika Express agar lebih terlihat
+        // OPSIONAL: Memberi warna merah jika express / super express agar lebih terlihat
         if(estimasiValue.toLowerCase() === 'express') {
+            outEstimasi.className = "font-bold text-amber-600 uppercase";
+        } else if (estimasiValue.toLowerCase() === 'super express') {
             outEstimasi.className = "font-bold text-red-600 uppercase";
         } else {
             outEstimasi.className = "font-bold text-black uppercase";
