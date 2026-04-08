@@ -202,7 +202,6 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
                         <select name="metode" class="w-full p-2 text-[11px] border rounded font-bold">
                             <option value="Tunai">Tunai</option>
                             <option value="Transfer BSI">Transfer BSI</option>
-                            <option value="Transfer BCA">Transfer BCA</option>
                         </select>
                     </div>
                 </div>
@@ -549,12 +548,36 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
         let isForcedLunas = false;
         // modal master barang
         function openModal(el) {
-            currentTargetRow = el.closest('.item-row');
-            document.getElementById('modalBarang').classList.remove('hidden');
-        }
-
-        function closeModal() { document.getElementById('modalBarang').classList.add('hidden'); }
+        // Simpan baris yang sedang aktif
+        currentTargetRow = el.closest('.item-row');
         
+        const modal = document.getElementById('modalBarang');
+        const searchInput = document.getElementById('searchBarang');
+
+        // 1. Tampilkan modal
+        modal.classList.remove('hidden');
+
+        // 2. Bersihkan pencarian lama & tampilkan kembali semua list barang
+        if (searchInput) {
+            searchInput.value = ''; // Kosongkan input
+            
+            // Reset tampilan list (agar tidak ada yang tersembunyi dari pencarian sebelumnya)
+            let rows = document.querySelectorAll('#listBarangModal > div');
+            rows.forEach(r => {
+                r.style.display = ''; 
+            });
+
+            // 3. Otomatis arahkan kursor ke input pencarian
+            // Menggunakan setTimeout agar browser memberikan fokus tepat setelah modal muncul
+            setTimeout(() => {
+                searchInput.focus();
+            }, 100);
+        }
+    }
+
+    function closeModal() { 
+        document.getElementById('modalBarang').classList.add('hidden'); 
+    }
         // --- LOGIKA MODAL PEMBAYARAN (BARU) ---
         function openPaymentModal(nota, sisa, nama) {
             document.getElementById('modalPayment').classList.remove('hidden');
@@ -571,22 +594,15 @@ $data_transaksi = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tgl_masu
         }
 
         function selectItem(nama, harga) {
-            if(currentTargetRow) {
-                currentTargetRow.querySelector('.in-item').value = nama;
-                currentTargetRow.querySelector('.in-harga').value = harga;
-                // 1. Reset input pencarian di modal
-                const searchInput = document.getElementById('searchBarang');
-                if (searchInput) searchInput.value = '';
-
-                // 2. Tampilkan kembali semua barang yang sempat terfilter (reset display)
-                let rows = document.querySelectorAll('#listBarangModal div');
-                rows.forEach(r => {
-                    r.style.display = ''; 
-                });
-                updateTotals();
-                closeModal();
-            }
+        if(currentTargetRow) {
+            // Isi input barang dan harga pada baris yang dipilih
+            currentTargetRow.querySelector('.in-item').value = nama;
+            currentTargetRow.querySelector('.in-harga').value = harga;
+            
+            updateTotals();
+            closeModal();
         }
+    }
 
         function switchTab(tab) {
             document.getElementById('section-input').classList.toggle('hidden', tab !== 'input');
