@@ -97,7 +97,7 @@ usort($data_gabungan, function($a, $b) {
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center h-16">
                 <a href="index.php">
-                    <img class="w-28 md:w-36" src="img/logo CV.png" alt="Logo">
+                    <img class="w-20 md:w-24" src="img/logo apparel.png" alt="Logo">
                 </a>
 
                 <div class="hidden md:flex space-x-6 text-sm font-bold uppercase items-center">

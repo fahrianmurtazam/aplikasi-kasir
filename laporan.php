@@ -64,16 +64,22 @@ if ($isExport) {
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center h-16">
                 <a href="index.php">
-                    <img class="w-28 md:w-36" src="img/logo CV.png" alt="Logo">
+                    <img class="w-20 md:w-24" src="img/logo apparel.png" alt="Logo">
                 </a>
 
                 <div class="hidden md:flex space-x-6 text-sm font-bold uppercase items-center">
                     <a href="index.php" class="hover:text-blue-800 transition">Input Pesanan</a>
                     <a href="barang.php" class="hover:text-blue-800 transition">Master Barang</a>
-                    <a href="laporan.php" class="text-blue-800 transition">Laporan Penjualan</a>
+                    <a href="laporan.php" class="hover:text-blue-800 transition">Laporan Penjualan</a>
                     <a href="aruskas.php" class="hover:text-blue-800 transition">Arus Kas</a>
                     <a href="javascript:void(0)" onclick="confirmLogout()" class="text-red-600 font-black hover:text-red-700 transition">
                         <i class="fas fa-sign-out-alt mr-2"></i> LOGOUT
+                    </a>    
+                    <a href="ganti_password.php" class="flex items-center text-gray-700 hover:bg-blue-50 hover:text-blue-800 rounded-2xl transition group">
+                        <div class="w-8 h-8 flex items-center justify-center rounded-xl bg-gray-100 group-hover:bg-blue-100 mr-1">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <span class="font-black text-xs uppercase tracking-widest">Keamanan</span>
                     </a>
                 </div>
 
